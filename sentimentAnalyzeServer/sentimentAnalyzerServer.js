@@ -13,7 +13,7 @@ function getNLUInstance() {
     const { IamAuthenticator } = require('ibm-watson/auth');
 
     const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
-        version: '2021-06-30',
+        version: '2021-03-25',
         authenticator: new IamAuthenticator({
             apikey: api_key,
         }),
@@ -23,8 +23,6 @@ function getNLUInstance() {
     return naturalLanguageUnderstanding;
 
 }
-
-
 
 
 
@@ -50,7 +48,27 @@ app.get("/url/sentiment", (req,res) => {
 });
 
 app.get("/text/emotion", (req,res) => {
-    return res.send({"happy":"10","sad":"90"});
+    naturalLanguageUnderstanding =  getNLUInstance();
+
+    const analyzeParams = {
+        'text': req.query.text,
+        'features': {
+            'emotion': {
+                'document': true,
+            },
+        },
+    };    
+
+    naturalLanguageUnderstanding.analyze(analyzeParams)
+    .then(analysisResults => {
+        console.log(JSON.stringify(analysisResults, null, 2));
+        return res.send(analysisResults.result.emotion.document.emotion);
+    })
+    .catch(err => {
+        return res.send({"error": err});
+    });    
+
+    
 });
 
 app.get("/text/sentiment", (req,res) => {
