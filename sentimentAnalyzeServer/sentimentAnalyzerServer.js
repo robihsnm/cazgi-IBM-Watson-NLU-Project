@@ -40,14 +40,52 @@ app.get("/",(req,res)=>{
 
 app.get("/url/emotion", (req,res) => {
 
-    return res.send({"happy":"90","sad":"10"});
+    naturalLanguageUnderstanding =  getNLUInstance();
+
+    const analyzeParams = {
+        'url': req.query.url,
+        'features': {
+            'emotion': {
+                'document': true,
+            },
+        },
+    };    
+
+    naturalLanguageUnderstanding.analyze(analyzeParams)
+    .then(analysisResults => {
+        return res.send(analysisResults.result.emotion.document.emotion);
+    })
+    .catch(err => {
+        return res.send({"error": err});
+    });    
+
 });
 
 app.get("/url/sentiment", (req,res) => {
-    return res.send("url sentiment for "+req.query.url);
+
+    naturalLanguageUnderstanding =  getNLUInstance();
+
+    const analyzeParams = {
+        'url': req.query.url,
+        'features': {
+            'sentiment': {
+                'document': true,
+            },
+        },
+    };    
+
+    naturalLanguageUnderstanding.analyze(analyzeParams)
+    .then(analysisResults => {
+        return res.send(analysisResults.result);
+    })
+    .catch(err => {
+        return res.send({"error": err});
+    });    
+
 });
 
 app.get("/text/emotion", (req,res) => {
+    
     naturalLanguageUnderstanding =  getNLUInstance();
 
     const analyzeParams = {
@@ -61,7 +99,6 @@ app.get("/text/emotion", (req,res) => {
 
     naturalLanguageUnderstanding.analyze(analyzeParams)
     .then(analysisResults => {
-        console.log(JSON.stringify(analysisResults, null, 2));
         return res.send(analysisResults.result.emotion.document.emotion);
     })
     .catch(err => {
@@ -72,7 +109,27 @@ app.get("/text/emotion", (req,res) => {
 });
 
 app.get("/text/sentiment", (req,res) => {
-    return res.send("text sentiment for "+req.query.text);
+
+    naturalLanguageUnderstanding =  getNLUInstance();
+
+    const analyzeParams = {
+        'text': req.query.text,
+        'features': {
+            'sentiment': {
+                'document': true,
+            },
+        },
+    };    
+
+    naturalLanguageUnderstanding.analyze(analyzeParams)
+    .then(analysisResults => {
+        return res.send(analysisResults.result.sentiment.document.label);
+    })
+    .catch(err => {
+        return res.send({"error": err});
+    });    
+
+
 });
 
 let server = app.listen(8080, () => {
