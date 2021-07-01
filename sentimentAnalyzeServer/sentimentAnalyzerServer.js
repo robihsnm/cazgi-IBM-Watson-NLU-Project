@@ -76,7 +76,7 @@ app.get("/url/sentiment", (req,res) => {
 
     naturalLanguageUnderstanding.analyze(analyzeParams)
     .then(analysisResults => {
-        return res.send(analysisResults.result);
+        return res.send(analysisResults.result.sentiment.document.label);
     })
     .catch(err => {
         return res.send({"error": err});
